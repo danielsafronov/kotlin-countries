@@ -1,5 +1,6 @@
 package app.countries.network
 
+import app.countries.base.Result
 import app.countries.network.model.Country
 import app.countries.network.service.CountryService
 import kotlinx.coroutines.flow.Flow
@@ -11,9 +12,10 @@ import javax.inject.Inject
  */
 interface CountrySDKInterface {
     /**
-     * Returns all countries.
+     * Returns a [Flow] with [List] of [Country] wrapped into [Result] instance.
+     * @return instance of [Flow].
      */
-    fun all(): Flow<List<Country>>
+    fun all(): Flow<Result<List<Country>>>
 }
 
 /**
@@ -21,13 +23,18 @@ interface CountrySDKInterface {
  */
 internal class CountrySDK @Inject constructor(
     private val countryService: CountryService,
-): CountrySDKInterface {
+) : CountrySDKInterface {
     /**
-     * Returns all countries.
+     * Returns a [Flow] with [List] of [Country] wrapped into [Result] instance.
+     * @return instance of [Flow].
      */
-    override fun all(): Flow<List<Country>> =
+    override fun all(): Flow<Result<List<Country>>> =
         flow {
-            val countries = countryService.all()
-            emit(countries)
+            try {
+                val countries = countryService.all()
+                emit(Result.Success(countries))
+            } catch (t: Throwable) {
+                emit(Result.Error(t))
+            }
         }
 }

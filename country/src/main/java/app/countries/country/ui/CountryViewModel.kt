@@ -3,6 +3,7 @@ package app.countries.country.ui
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.countries.base.Result
 import app.countries.data.repository.CountryRepositoryInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +17,7 @@ import javax.inject.Inject
 internal class CountryViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val repository: CountryRepositoryInterface,
-): ViewModel() {
+) : ViewModel() {
     private val countryId: String = savedStateHandle.get("countryId")!!
 
     val state: MutableStateFlow<CountryState> = MutableStateFlow(CountryState.Empty)
@@ -24,10 +25,13 @@ internal class CountryViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             CoroutineScope(Dispatchers.IO).launch {
-                repository.observe(countryId).collectLatest { country ->
-                    state.value = country
-                        ?.let { CountryState(country = it) }
-                        ?: CountryState.Empty
+                repository.observe(countryId).collectLatest { result ->
+                    state.value = when (result) {
+                        is Result.Success -> result.value
+                            ?.let { CountryState(country = it) }
+                            ?: CountryState.Empty
+                        is Result.Error -> CountryState.Empty
+                    }
                 }
             }
         }

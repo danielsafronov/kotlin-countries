@@ -2,6 +2,7 @@ package app.countries.countrylist.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.countries.base.Result
 import app.countries.data.repository.CountryRepositoryInterface
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -20,10 +21,11 @@ internal class CountryListViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             CoroutineScope(Dispatchers.IO).launch {
-                repository.observe().collectLatest { countries ->
-                    state.value = CountryListState(
-                        countries = countries
-                    )
+                repository.observe().collectLatest { result ->
+                    state.value = when (result) {
+                        is Result.Success -> CountryListState(countries = result.value)
+                        is Result.Error -> CountryListState.Empty
+                    }
                 }
             }
         }
