@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="Countries.app" target="11" />
+      <module name="Countries.country" target="11" />
+      <module name="Countries.countrylist" target="11" />
+      <module name="Countries.data" target="11" />
+      <module name="Countries.myapplication" target="11" />
+      <module name="Countries.network" target="11" />
+      <module name="Countries.storage" target="11" />
+      <module name="Countries.ui" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
